@@ -1,0 +1,551 @@
+﻿Found PDF files: ['20_Adaptive HumanûRobot Interaction through Multimodal Emotion, Gesture, and Context Aware Policy Learning (1).pdf', 'HRI_Scenarios.pdf']
+
+================================================================================
+FILE: 20_Adaptive HumanûRobot Interaction through Multimodal Emotion, Gesture, and Context Aware Policy Learning (1).pdf
+================================================================================
+
+--- PAGE 1 ---
+Adaptive HumanûRobot Interaction
+through Multimodal Emotion, Gesture,
+and Context Aware Policy Learning
+An undergraduate project proposal report submitted to the
+Department of Electrical and Information Engineering
+Faculty of Engineering
+University of Ruhuna
+Sri Lanka
+in partial fulfillment of the requirements for the
+Degree of the Bachelor of the Science of Engineering
+Honours
+by
+Dewthilini G.W.B.S. - RU/E/2021/4475
+Edirisinghe E.A.T.U.G. - RU/E/2021/4502
+Gunarathna B.V.I.D.W. - RU/E/2021/4524
+Gunathilaka G.P.K.H. - RU/E/2021/4531
+..............................................
+Dr. G.W.K.N. Udayanga
+(Supervisor)..............................................
+Dr. Charaka Rasanga
+(Co-Supervisor)
+
+--- PAGE 2 ---
+Abstract
+Human Robot Interaction is shifting from the command-based control systems to
+more complex systems. This is because the command-based systems are natu-
+ral and intelligent communication. For robots to be able to successfully interact
+with humen, they have to listen not only to spoken directions but also to hu-
+man emotions, actions, and the surrounding environment. This project illustrates
+an adaptive Human Robot Interaction framework that allows robots to respond
+intelligently by learning from multimodal human cues.
+The proposed system integrates emotion recognition, gesture and motion un-
+derstanding, and context awareness using advanced techniques from Artificial In-
+telligence and Computer Vision. Unlike traditional rule-based systems, this model
+dynamically weights cues based on their reliability and the surrounding seman-
+tic context, allowing it to resolve scenarios where human cues are conflicting or
+ambiguous also.
+By combining multimodal perception with context aware policy learning, the
+project contributes toward building ösocially awareö robots that can interact with
+humans in a more empathetic, flexible and meaningful way. This approach aims
+to enhance the naturalness, safety and effectiveness of human robot collaboration
+in real world environments.
+ii
+
+--- PAGE 3 ---
+Contents
+Acronyms vi
+1 Introduction 1
+1.1 Background . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1
+1.2 Problem Statement . . . . . . . . . . . . . . . . . . . . . . . . . . . 2
+1.3 Objectives and Scope . . . . . . . . . . . . . . . . . . . . . . . . . 2
+2 Literature Review 4
+2.1 Previous Work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+2.1.1 HRI with rule-based systems . . . . . . . . . . . . . . . . . . 4
+2.1.2 HRI with single modality . . . . . . . . . . . . . . . . . . . . 4
+2.1.3 HRI with fusing more than one modality . . . . . . . . . . . 5
+2.1.4 HRI on edge devices . . . . . . . . . . . . . . . . . . . . . . 5
+2.1.5 Available datasets for HRI research . . . . . . . . . . . . . . 6
+2.2 Gaps in Literature . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+2.2.1 Lack of ambiguous social data . . . . . . . . . . . . . . . . . 6
+2.2.2 Fragmentation and Temporal Blindness in Intent Synthesis . 6
+2.2.3 Computational Bottleneck on Edge Robotics Platforms . . . 6
+2.2.4 Lack of Intent and Context-Aware Policy Learning . . . . . 7
+3 Methodology 8
+3.1 Research Design . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+3.1.1 Multimodal Feature Extraction . . . . . . . . . . . . . . . . 9
+3.1.2 Cross-Modal Fusion Architecture . . . . . . . . . . . . . . . 9
+3.1.3 Cross-Modal Fusion Architecture . . . . . . . . . . . . . . . 11
+3.1.4 Closed-Loop Sim-to-Real Tuning . . . . . . . . . . . . . . . 13
+3.1.5 Edge Optimization (TensorRT) . . . . . . . . . . . . . . . . 13
+3.1.6 Multimodal öGolden Trialö Validation . . . . . . . . . . . . 13
+3.2 Data Collection . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+4 Timeline and Resource Required 15
+4.1 Timeline . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15
+4.2 Resource Required . . . . . . . . . . . . . . . . . . . . . . . . . . . 15
+5 Conclusion 17
+References 17
+iii
+
+--- PAGE 4 ---
+List of Figures
+3.1 System Architecture . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+iv
+
+--- PAGE 5 ---
+List of Tables
+3.1 Comparison of Rule-Based vs. Fusion of Four Cues . . . . . . . . . 11
+4.1 Project Timeline . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15
+4.2 Required Hardware Resources . . . . . . . . . . . . . . . . . . . . . 16
+4.3 Required Software Resources . . . . . . . . . . . . . . . . . . . . . . 16
+v
+
+--- PAGE 6 ---
+Acronyms
+AIArtificial Intelligence
+AUAction Unit
+CUDACompute Unified Device Architecture
+CVComputer Vision
+DDQNDouble Deep Q-Network
+HRIHuman-Robot Interaction
+LTSLong Term Support
+NLPNatural Language Processing
+RGB-DRed Green Blue - Depth
+ROSRobot Operating System
+VLMVision-Language Model
+VRAMVideo Random Access Memory
+vi
+
+--- PAGE 7 ---
+Chapter 1
+Introduction
+Modern service robotics is currently grappling with a phenomenon known asBe-
+havioral Rigidity, where machines fail to adapt their physical actions to the
+nuanced emotional and contextual signals inherent in human communication. Cur-
+rent systems are capable of detecting discrete human gestures, such as ôpointingö
+at an exit, but it often fails to identify the meaning or the underlying intent of
+that gesture. For example, whether that ôpointingö at an exit action is a helpful
+request for directions or an angry complaint regarding service. To address this
+problem, this project proposes aReal-Time Multimodal Intent-Synthesis
+Framework, followed byintent and context-aware policy learning. By
+fusing four different pillars of human communication, such as emotion, motion,
+gesture, and context, this system aims to resolve conflicting social cues and pro-
+vide robotic responses that are not only physically safe but also socially aware and
+proactive.
+1.1 Background
+The evolution of human-robot interaction (HRI) has gone beyond simply perform-
+ing a task. Robots should be able to interpret the öwhyö behind human actions.
+This helps robots to behave proactively rather than reactively. This evolution is
+driven by several key factors:
+òDominance of Non-Verbal Communication:Effective human commu-
+nication heavily relies on a complex non-verbal signal, which includes facial
+micro-expressions, body language, and hand gestures. Academic research
+suggests that a significant portion of emotional intent is conveyed through
+these non-verbal channels, making social vision a prerequisite for empathetic
+robotics [1].
+òChallenge of Semantic Ambiguity:A core problem in social robotics
+is semantic ambiguity, where a single gesture carries different meanings de-
+pending on the userÆs emotional state and physical environment. For exam-
+ple, a person running towards a robot with a smile may symbolize a greet-
+ing, while the same movement with a frightened expression may indicate an
+emergency.
+1
+
+--- PAGE 8 ---
+òTechnological Shift toward Transformers:Traditional rule-based (IFûTHEN)
+systems are considered too rigid to handle the ambiguous and conflicting na-
+ture of social data. Modern architectures are moving toward Transformer-
+based models. Transformer-based models utilize self-attention mechanisms
+to weigh different input streams simultaneously to resolve social dissonance.
+òHardware and Edge-Compute Advancements:The migration of com-
+plex ôsocial brainsö from remote servers to internal robotic platforms is en-
+abled by advances in edge-computing hardware. Platforms like the NVIDIA
+Jetson Orin Nano, combined with optimization tools like TensorRT, allow
+for high-frequency processing. This is necessary for secure and responsive
+real-time interactions.
+1.2 Problem Statement
+Although there have been significant advances in individual sensing technologies,
+current HRI systems remain emotionally blind and behaviorally rigid. Most ex-
+isting frameworks rely on fixed and rule-based policies, which fail to capture the
+dynamic nature of human behavior. This creates several critical challenges:
+òAmbiguity of Single Modalities:A major limitation of current systems
+is their inability to resolve ambiguity when relying on a single source of
+information. For instance, a raised-hand gesture may represent a greeting, a
+command to stop, or an expression of surprise, depending on the userÆs facial
+emotion and environmental context. Without multimodal fusion, robots
+frequently misinterpret human intent.
+òInadequate Multimodal Fusion:Existing systems often process emo-
+tions, gestures, and contextual cues as single inputs rather than as a fused
+signal. This leads to fragmented perception and a lack of holistic under-
+standing.
+òRigid Interaction Models:Rule-based models often fail to adapt to hu-
+man behavior in real time with varying human emotions or environmental
+contexts. This leads to unnatural or frustrating interactions between humans
+and robots.
+Therefore, there is a clear need for a lightweight, multimedia HRI framework
+that jointly perceives emotional, gestural, and contextual cues to dynamically and
+efficiently adapt robot responses.
+1.3 Objectives and Scope
+Objectives
+òSynthesize a High-Fidelity Multimodal Datasetû To generate a high-
+quality dataset comprising over 60 socially ambiguous interaction scenarios
+using NVIDIA Isaac Sim and Audio2Face, with automatic ground-truth an-
+notations, supplemented by a limited real-world validation set.
+2
+
+--- PAGE 9 ---
+òDevelop a Multimodal Fusion Engineû To design and implement a late-
+fusion architecture that integrates emotional cues, physical gestures, human
+motion, and environmental context for robust intent inference.
+òOptimize for Edge Deploymentû To deploy and optimize the trained
+model on NVIDIA Jetson Orin Nano hardware using TensorRT, achieving
+real-time inference with latency below 100 milliseconds.
+òValidate in Simulation as well as with Real-World Scenariosû Eval-
+uate the proposed system in a simulation environment followed by some
+selected real-world scenarios.
+Scope
+This project focuses on the end-to-end design, integration, and deployment of a
+complete HRI system that enables socially intelligent robotic behavior. A key
+challenge addressed in this work is the lack of a unified dataset that jointly rep-
+resents context, emotion, gesture, and motion, which are essential components of
+socially aware robot decision-making.
+To address this limitation, the project emphasizes dataset integration and syn-
+thetic data generation, supported by self-supervised learning techniques, to bridge
+gaps between modality-specific datasets and enable coherent multimodal learning.
+What is IN Scope:
+òEnvironments:The study is limited to indoor service settings (specifically
+Hospitals, Museums, and Retail areas) where social norms are well-defined.
+òHuman Cues:The system will focus on non-verbal communication only.
+This includes facial micro-expressions (Affect), body language (Motion), and
+hand signals (Gesture).
+òInteraction Type:One-on-one interactions between a single human and a
+single robot.
+What is OUT of Scope:
+òVerbal Communication:The project will not involve NLP or speech-to-
+text, focusing purely on visual/physical ôSocial Vision.ö
+òCrowd Dynamics:The model is not intended for ôSocial Navigationö in
+dense crowds (e.g., a busy train station); it focuses on direct interpersonal
+intent.
+òOutdoor Operation:Weather-related variables, uneven terrain, and out-
+door lighting fluctuations are excluded.
+òMechanical Design:The project uses off-the-shelf mobile bases (AgileX
+LIMO); it does not involve the design or fabrication of new robotic hardware.
+3
+
+--- PAGE 10 ---
+Chapter 2
+Literature Review
+2.1 Previous Work
+2.1.1 HRI with rule-based systems
+Traditional HRI systems mostly rely on rigid, rule-based scripts to govern robot
+behavior. Therefore these systems typically use pre programmed öif-thenö logic
+to map specific inputs to the outputs such asöif the user is happy, offer to play a
+gameö [2]. However, this approach lacks the flexibility required for real world social
+interaction. Mamodiyaetal. (2025) [3] note that these systems depend mainly on
+predefined scripts or single perceptual modalities. It makes themöbrittleöwhen fa-
+cial cues are occluded or lighting varies [4]. Furthermore, AhmedandAleem(2025)
+[5] shows that, as these serobots are preprogrammed for specifictasks, they fail
+to recognize human emotions or communicate with contextual cues. It prevents
+them from adapting to changing environments.
+2.1.2 HRI with single modality
+Many existing HRI systems use single input type, which often leads to incomplete
+perceptions of the userÆs state.
+òGestures Only: Systems focus on gestures often struggle with environmental
+interference. As a example, the geometric relationship methods for the ges-
+ture recognition fail in noisy environments or complex backgrounds [6]. Ac-
+cording to the subject differences in performing the same gesture like speed
+or range of motion, make it difficult for single-modality models to learn un-
+seen feature variations to recognition failure [7]. But these systems have not
+ability to interpret intent or handle ambiguity without corroborating data.
+òEmotion Only: Research relying only on emotion recognition faces signif-
+icant robustness issues. Bamforth(2024) [8] notes that face based systems
+incorrect or fail when faces are blurred, not in the frame, or in low light. Lin
+et al. (2023) [9] further argue that main stream emotion recognition methods
+focus on short-term perception, disregarding the context in which emotions
+are perceived ,which leads to identification failures. But these systems lack
+context and robustness against occlusion.
+4
+
+--- PAGE 11 ---
+òMotion Only: Systems using only motion sensors or vision-based motion
+extraction can capture physical movement but miss the semantic meaning
+behind it. While effective for basic signaling, utilizing sensors can introduce
+increased communication costs and complexities, as individuals are required
+to wear sensor sets [10]. But motion data alone fails to capture the öwhyö
+behind an action (intent) or the emotional state of the user.
+2.1.3 HRI with fusing more than one modality
+To overcome single-modality limitations, recent research has focused on fusing
+multiple inputs.
+òECRP (Mamodiya et al., 2025) [3]: This framework fuses facial and vocal
+emotion cues using a confidence-weighted attention layer. It integrates these
+with a context vector (history, time-of-day) into a DDQN for adaptive task
+planning [11].
+òTransformer-Based Fusion (Mohamed et al.) [12]: This approach utilizes
+modality-specific encoders for facial thermal data, facial AUs, and textual
+context. These are combined via additive fusion and processed by a shared
+transformer encoder to capture temporal dependencies.
+òFAM-HRI (Lai et al., 2025) [13]: This system integrates gaze and speech
+data captured by wearable ARIA glasses. It uses a GPT-based agent to
+align spoken commands with gaze fixation periods to determine user intent
+in cluttered environments [14].
+òContext-Aware Two-Stream Network (Wang et al., 2024) [10]: This method
+fuses first-person vision (video) with motion sensory data. One stream ex-
+tracts visual context using attention maps (gaze), while the second processes
+motion data, combining them to recognize gestures for construction robots.
+òHierarchical Fusion Engine (Ahmed Aleem, 2025) [5]: This framework pro-
+cesses visual (facial), auditory (speech tone), and kinesthetic inputs. It uses
+a hierarchical fusion engine to integrate emotional and environmental data
+at feature, semantic, and decision levels to drive a collaborative decision
+engine.
+2.1.4 HRI on edge devices
+Deploying multimodal models on edge devices is critical for real-time interac-
+tion but presents computational challenges. Park et al. (2025) [15] utilized the
+NVIDIA Jetson AGX Orin to optimize open-vocabulary perception pipelines, us-
+ing TensorRT to bridge the öreal-time gapö and balancing accuracy with latency.
+Mamodiya et al. (2025) [3] optimized their ECRP framework for the NVIDIA
+Jetson Nano. They demonstrated that while Raspberry Pi 4 struggled (4 fps), the
+Jetson Nano with TensorRT acceleration achieved 30 fps and sub-400ms latency,
+proving the feasibility of complex fusion on low-power hardware [16].
+5
+
+--- PAGE 12 ---
+2.1.5 Available datasets for HRI research
+Data is essential for training adaptive HRI systems. The FER+ [3] and CK+
+[8] datasets are widely used for facial emotion training, while RAVDESS [3]
+and IEMOCAP [9] are standard for vocal and multimodal emotion recognition.
+Chalearn is a large-scale RGB-D dataset for gesture recognition, containing both
+isolated and continuous gestures performed by multiple subjects. Widely used for
+vision-based hand/arm gesture recognition. For motion and action recognition,
+the NTU RGB-D [17] dataset is a common benchmark. To address the scarcity
+of real-world interaction data, simulations are frequently used. Mamodiya et al.
+(2025) [3] utilized a ROS-Gazebo environment to pre-train their reinforcement
+learning policy before fine-tuning it on real hardware.
+2.2 Gaps in Literature
+2.2.1 Lack of ambiguous social data
+A significant gap that can be seen is the scarcity of unified datasets that cap-
+ture all interaction pillars simultaneously. Most of the existing datasets focus
+more on pairs of modalities such as Audio-Visual rather than the full spectrum
+of Emotion, Gesture, Motion, and Context. Lin et al. (2023) [8] shows that the
+emotion recognition becomes more complex when öinformation conflicts arise be-
+tween modalities,ö yet few datasets exist to train robots to resolve these conflicts
+effectively.
+2.2.2 Fragmentation and Temporal Blindness in Intent Syn-
+thesis
+Current research treats multimodal fusion as a secondary task which leads to
+temporal misalignment. Lai et al. (2025) [13] point out that only few methods
+model the ötemporal alignment between gaze and speech,ö which note that the
+natural gaze behavior is noisy and users may look at an object moments before
+speaking. Viswanath et al. (2025) [18] argues that the robots often receive verbal
+commands (e.g., öput the cup thereö) that do not align perfectly in time with their
+visual perception. It suggest necessity of having a dedicated öTemporal Alignment
+moduleö to evaluate the relevance of inputs.
+2.2.3 Computational Bottleneck on Edge Robotics Plat-
+forms
+There is a difference between high accurate AI models and the mobile robot hard-
+ware capabilities. Park et al. (2025) [15] highlight this öreal-time gap,ö note that
+while VLMs do the powerful recognition. Their high computational cost makes
+them difficult to deploy on edge devices like the Jetson Orin without optimization.
+This bottleneck forces a trade between semantic understanding and reaction speed
+[19].
+6
+
+--- PAGE 13 ---
+2.2.4 Lack of Intent and Context-Aware Policy Learning
+Most HRI systems focus on perception rather than action. Mamodiya et al. (2025)
+[3] argue robots can detect emotions, they often lack a ösocial policyö to adapt
+their behavior is a reason to öBehavioral Rigidityö. Existing approaches often do
+not take öemotional context into consideration while planning for a task,ö result
+in robots that can sense a user is frustrated but cannot change dynamically their
+task planning to clear that frustration.
+7
+
+--- PAGE 14 ---
+Chapter 3
+Methodology
+3.1 Research Design
+This chapter presents the design science and experimental research approach,
+where an intelligent Human Robot Interaction system is designed, implemented,
+and evaluated.The research focuses on developing a multimodal adaptive interac-
+tion framework that enables a robot to understand:
+òHuman emotions
+òHuman gestures
+òHuman movements
+òInteraction context
+Motion Extractor
+Emotion Extractor
+Gesture Extractor
+Context ExtractorMulti-modal Sensor 
+Data (RGB + Depth) 
+Man waving (gesture) with
+smile (emotion) while
+walking (motion)
+at a clinic (context).Temporal-A ware
+Multimodal Cue
+Integration Engine
+(Ex: RNN ,
+Transformer)Behavioral policy
+mapping for Robot
+action decodingPredicted 
+Intent
+Edge Optimized model
+to deploy on Nvidia
+Jetson orin nanoCheck for Safety
+Rule violationsDecoding Robot
+actions 
+Figure 3.1: System Architecture
+and to learn context aware interaction policies using AI and CV techniques.
+8
+
+--- PAGE 15 ---
+3.1.1 Multimodal Feature Extraction
+Four independent models are trained separately to capture key aspects of human
+behavior and environmental awareness. These models focus on human emotion
+recognition, human gesture recognition, human movement understanding, and in-
+teraction context identification. Training each model independently allows precise
+learning of each cue before higher-level fusion.
+The raw image stream is processed by the robot using perception models that can
+work in real-time. Facial expression analysis is employed for extracting emotional
+expressions, while skeletal and hand pose models are used for gesture recognition.
+Human motion is analyzed by determining velocity and direction between frames,
+while environmental markers are detected for interaction context.
+All the extracted cues are then converted to numerical feature vectors for angles,
+distances, intensity of movement, and spatial relations. Such a representation
+makes it easier to process visual data as it reduces complexities in visual data.
+3.1.2 Cross-Modal Fusion Architecture
+This is the heart of the process of understanding the intent, where all the four
+cues: human emotion, gesture, movement, and interaction context, are combined
+to understand what the user actually wants to do. All the cues are not considered
+to be of equal importance at all times. Rather, the system considers all the cues
+at once and gives more importance to those cues which best identify the current
+situation.
+This fusion makes it possible for the system to cope with cases where human
+behavior is ambiguous or mixed. For example, a person can display a behavior
+of engagement through a gesture, but when he or she moves rapidly, it shows
+urgency. In this case, movement-related information will become more significant
+than gestures for determining the purpose.
+Intent explains the reason behind a personÆs actions. While the perception stage
+identifies visible behaviors such as facial expressions, gestures, and movement, the
+intent layer focuses on understanding why those actions are happening and what
+is likely to happen next. This allows the robot to respond in advance instead of
+reacting only after a problem occurs.
+Compared to rule based approaches, which rely on fixed conditions and respond
+only when a rule is triggered, intent based decision making allows the robot to
+behave more naturally and safely in real world human interactions. For example,
+When the emotion is angry and gesture is wave , due to their conflicting nature
+rule-based system gives an error while four-cues fused model identified it as frus-
+trated or help seeking request from human. Also when the emotion is panicked
+9
+
+--- PAGE 16 ---
+and the gesture is waving, the rule-based system ignores the panic emotion while
+through multi-modal fusion it is understanded as emergency evaluation signal.
+The Limitation of Rule-Based Systems in Social Robotics
+In this subsection we explain some of the main limitations of rule-based systems
+and how our proposed fusion method will help to mitigate those limitations by
+using some practical scenarios.
+1.The Complexity of Fuzzy Social Cues
+Human social behavior is often unclear and strongly dependent
+on context. Emotions, gestures, movements, and situations rarely
+convey meaning on their own. Rule-based systems rely on fixed
+IFûTHEN logic, which makes them poorly suited to handle such
+uncertainty.
+The same action can represent different intentions depending on
+accompanying cues. For example, a smile with a hand wave may
+indicate a greeting, while a smile combined with fast movement
+may indicate urgency or stress. Handling these variations would
+require a large and complex set of rules, which becomes difficult
+to manage as the number of cues increases.
+The Fusion of Four Cues approach addresses this limitation by
+jointly considering emotion, gesture, movement, and context. In-
+stead of relying on predefined rules, the system evaluates all cues
+together to determine the most likely intent, allowing it to handle
+ambiguous social situations more effectively.
+2.Handling Dissonant (Conflicting) Data
+Humans frequently often give conflicting signals, and social behav-
+ior is not very easy to read. A rule-based strategy tends to stumble
+here, occasionally missing one cue or misreading how cues fit to-
+gether. Take a grin combined with rapid movements-that can trip
+up a rigid rule system. The Fusion of Four Cues model repairs
+this by taking all emotion, gesture, movement, and context into
+consideration in concert. It does so by evaluating such factors in
+a manner that can identify the actual patterns-things like distin-
+guishing an ôAngry Waveö from a ôHappy Wave.ö
+3.Temporal Dependencies
+Human intention is not something static; itÆs a process that takes
+time. Rule-governance systems fail to capture that, since their
+10
+
+--- PAGE 17 ---
+scope is limited to the current state of observation. Picture a
+person waving their arm and approaching the robot with a visibly
+angry face. A system of rules could interpret both the wave and
+the movement towards the robot as a welcoming gesture despite
+an angry face. In turn, that could lead to a robot that reaches a
+personÆs personal space.
+The Fusion of Four Cues method addresses this issue in the combi-
+nation of emotion, gesture, movement, and context in a temporal
+window. From the learning of this method, it was established that
+the anger signal is more weighted than the wave signal, and as a
+result, the robot will interpret the signal as ôThreat/Avoidance.ö
+With this knowledge, the robot will move slowly and maintain a
+safe distance.
+Table 3.1: Comparison of Rule-Based vs. Fusion of Four Cues
+Feature Rule-Based Fusion of Four Cues
+Handling
+NoiseRigid. If one sensor is slightly
+off, the whole rule breaks.Robust. If the camera is
+blurry, it relies more on
+LiDAR or Motion.
+AmbiguityFails. Cannot handle ôHappyö
+and ôAngryö at the same time.Succeeds. It understands
+ôSarcasmö or ôDissonanceö as
+a unique state.
+ScalabilityImpossible. A rule-based
+system would require
+1,000,000 rules for every
+human variation.Easy. It learns ôPatternsö
+from 60+ Isaac Sim scenarios.
+TimingStatic. It only looks at the
+ôCurrentö frame.Temporal. It remembers the
+path of the emotion over the
+last 5 seconds.
+Table 3.1 further compares the suggested fusion method with rule-based in
+terms of noise and ambiguity handling capability, scalability and timing. So in
+summary, we hypothesize effective fusing of the desired four cues has the potential
+for ambiguity handling, temporal memory, global context awareness and hence can
+mitigate the rule-based system drawbacks.
+3.1.3 Cross-Modal Fusion Architecture
+Once the intent is understood,this layer converts that ôWhyö into a ôHowö using
+Proxemic Rules. It updates the robotÆs navigation map by creating a large ôin-
+11
+
+--- PAGE 18 ---
+Error reading 20_Adaptive HumanûRobot Interaction through Multimodal Emotion, Gesture, and Context Aware Policy Learning (1).pdf: 'charmap' codec can't encode character '\u2192' in position 809: character maps to <undefined>
+
+================================================================================
+FILE: HRI_Scenarios.pdf
+================================================================================
+
+--- PAGE 1 ---
+ 
+Core Scenario Table  
+ID Env Scenario  Intent  Emotion  Gesture  Motion  Context  Difficulty  
+C1 Classroom  Student with raised hand, confused  HELP_REQUEST  Sad One hand raised  Stationary  Near desks  Easy  
+C2 Classroom  Student passing with quick wave  NEUTRAL_PASS  Happy  Brief wave  Fast, across  Corridor  Medium  
+C3 Classroom  Teacher pointing at door  GIVE_WAY  Angry  Pointing  Approaching  Doorway  Easy  
+C4 Classroom  Student carrying books  GIVE_WAY  Neutral  None  Slow approach  Near shelves  Easy  
+C5 Classroom  Panicking student  running  EMERGENCY  Fearful  Arms waving  Fast toward robot  Open area  Medium  
+O1 Office  Worker passing with wave  NEUTRAL_PASS  Neutral  Brief wave  Fast, across  Corridor  Medium  
+O2 Office  Worker pointing at blocked shelf  GIVE_WAY  Angry  Pointing  Approaching  Shelf  area  Easy  
+O3 Office  Colleague greeting  GREETING  Happy  Wave  Approach + stop  Open area  Easy  
+O4 Office  Sad worker beckoning  HELP_REQUEST  Sad Beckoning  Stationary  Workstation  Easy  
+O5 Office  Collapsed person reaching  EMERGENCY  Fearful  Reaching  Minimal  Floor  Medium  
+K1 Kitchen  Frustrated cook beckoning  HELP_REQUEST  Angry  Beckoning  Stationary  Counter  Easy  
+K2 Kitchen  Person backing from stove  EMERGENCY  Surprised  Arms up  Backing away  Stove  Medium  
+K3 Kitchen  Cook pointing at cabinet  TASK_ASSIST  Neutral  Pointing  Stationary  Cabinet  Easy  
+K4 Kitchen  Cook carrying pot  GIVE_WAY  Neutral  None  Approaching  Narrow path  Easy  
+K5 Kitchen  Cook walking across  NEUTRAL_PASS  Happy  None  Across  Kitchen  Easy  
+ 
+ 
+ 
+ 
+
+--- PAGE 2 ---
+Error reading HRI_Scenarios.pdf: 'charmap' codec can't encode character '\u2714' in position 86: character maps to <undefined>

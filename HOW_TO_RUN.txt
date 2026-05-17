@@ -1,0 +1,133 @@
+============================================================
+        HOW TO RUN THIS PROJECT
+    MCN - Multimodal Cross-Modal Network
+   Adaptive Human-Robot Interaction System
+============================================================
+
+
+==============================
+ STEP 1: ACTIVATE ENVIRONMENT
+==============================
+
+Open PowerShell or Command Prompt, go to project folder:
+
+    cd D:\FYP_Tranformer
+
+Activate the Python virtual environment:
+
+    .\env\Scripts\activate
+
+You should see (env) at the beginning of your terminal line.
+This means you are using the correct Python with all packages.
+
+If you DON'T see (env), the environment is NOT active!
+Always activate first before running anything.
+
+
+==============================
+ STEP 2: RUN WITH VIDEO FILE
+==============================
+
+Put your test videos inside the "testVideos" folder.
+
+To see an interactive menu of all your videos and choose one to run:
+
+    python select_and_run.py
+
+This will:
+  - List all videos in the folder
+  - Ask you to type a number to select one
+  - Open the chosen video
+  - Run all 4 AI models on each frame
+  - Show detected emotion, gesture, motion, and context
+  - Show the robot's scenario decision and action
+  - Save the annotated video to the testVideos folder with "_MCN_result" added to the name.
+
+Example manual command (if you don't want to use the menu):
+
+    python run_video.py --input testVideos\classroom_scene.mp4 --output testVideos\classroom_result.mp4
+
+
+==============================
+ STEP 3: RUN WITH WEBCAM
+==============================
+
+To use your webcam (live camera):
+
+    python run_video.py --input 0
+
+Press 'q' or ESC to stop the webcam.
+
+To save webcam output to a file:
+
+    python run_video.py --input 0 --output testVideos\webcam_result.mp4
+
+
+==============================
+ STEP 4: TRAIN THE MCN MODEL
+==============================
+
+The MCN fusion model needs to be trained before it gives
+accurate scenario predictions. Run:
+
+    python -m mcn.train
+
+This trains on synthetic data (auto-generated from 18 scenarios).
+Training takes about 5-10 minutes.
+
+After training, run videos with the trained model:
+
+    python run_video.py --input testVideos\test.mp4 --checkpoint checkpoints\best_model.pt
+
+
+==============================
+ STEP 5: RUN UNIT TESTS
+==============================
+
+To verify everything is working:
+
+    python tests\test_model.py
+    python tests\test_pipeline.py
+
+
+==============================
+ USEFUL OPTIONS
+==============================
+
+--no-mtcnn     Faster face detection (less accurate)
+--no-display   Run without video window (headless)
+--max-frames   Process only first N frames
+--quiet        Don't print JSON to console
+
+Example (fast mode, no display):
+
+    python run_video.py --input testVideos\test.mp4 --output testVideos\result.mp4 --no-mtcnn --no-display
+
+
+==============================
+ TROUBLESHOOTING
+==============================
+
+Problem: "ModuleNotFoundError: No module named 'cv2'"
+Fix:     Make sure you activated the environment first!
+         Run: .\env\Scripts\activate
+
+Problem: "python" opens wrong Python version
+Fix:     Use the full path: d:\FYP_Tranformer\env\Scripts\python.exe
+
+Problem: Camera not working
+Fix:     Try --input 1 instead of --input 0 (different camera)
+
+Problem: Video file not found
+Fix:     Use the full path or make sure the file is in testVideos folder
+
+
+==============================
+ QUICK START (COPY-PASTE)
+==============================
+
+    cd D:\FYP_Tranformer
+    .\env\Scripts\activate
+    python -m mcn.train
+    python run_video.py --input testVideos\your_video.mp4 --output testVideos\result.mp4 --checkpoint checkpoints\best_model.pt
+

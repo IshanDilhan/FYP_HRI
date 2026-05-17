@@ -1,0 +1,26 @@
+# MCN - Multimodal Cross-Modal Network
+# Strict requirements to prevent dependency conflicts between TF, MediaPipe, and Numpy 2.0
+
+# Core ML
+torch==2.2.2
+torchvision==0.17.2
+
+# Computer Vision
+opencv-python==4.9.0.80
+opencv-contrib-python==4.9.0.80
+
+# Upstream Models
+fer==25.10.3
+mediapipe==0.10.10
+facenet-pytorch==2.6.0
+pillow<10.3.0
+
+# TensorFlow (required by FER)
+tensorflow==2.15.0
+keras<3.0
+
+# Protocol Buffers (strict version required by TF 2.15 and MP 0.10.10)
+protobuf==3.20.3
+
+# Utilities
+numpy<2.0.0

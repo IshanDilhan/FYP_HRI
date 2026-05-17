@@ -1,0 +1,342 @@
+﻿================================================================================
+FYP REPORT - REMAINING PAGES
+================================================================================
+Total pages: 25
+
+--- PAGE 18 ---
+visible bubbleΓÇ¥ around the person that the robot should not enter, using ROS2
+Behavior Trees. This step ensures that the robot not only avoids hitting the per-
+son but also maintains a distance that feels comfortable and respectful, turning
+AI decisions into socially acceptable actions.
+Step A: Action Decoding
+The fusion of four cues generates a probability distribution (e.g., 85% Emergency
+Passage). The intent decoder is the software component that selects the highest
+probability and determines: ΓÇ¥Current Intent = EMERGENCY.ΓÇ¥
+Step B: Behavioral Policy Mapping
+This stage requires more than just intent recognition. The robot evaluates Intent
++ Context Decoder (environmental factors) to select an appropriate behavioral
+policy.
+Case 1:Purpose is Emergency + Surroundings are Narrow Hallway
+ΓåÆPolicy: Yield position and move to wall.
+Case 2:Intent is Emergency + Context is Open LobbyΓåÆPolicy:
+The social buffer distance should be increased and the present trend
+should be maintained.
+Step C: Controller Execution
+The chosen behavioral policy is sent to the ROS2 Nav2 Stack, where the calcula-
+tions for the actual wheel velocities are done.
+Example: The ΓÇ£Sarcastic GreetingΓÇ¥
+Scenario: The Hostile Approach
+Initial Classification:ΓÇ£Friendly ApproachΓÇ¥ identified (Individual
+displays wave gesture and move forward towards robot).
+Decision Using Intent Only:The robot recognizes the ΓÇ¥ApproachΓÇ¥.
+It is the intent and causes the initiation of the forward motion to de-
+crease the separation distance for in interaction initiation (for instance,
+in order to convey information or offer help).
+Critical Failure:The robot ignored the conflicting emotional cues
+(hostile facial expression) and boundary of space principles. It did not
+to acknowledge that the person was displaying aggressive/confrontational
+behavior. By closing the distance, the robot violated the ΓÇ£Threat Re-
+sponse ZoneΓÇ¥ for this person. The upset person felt ΓÇ£threatenedΓÇ¥ be-
+cause he/she could see the robot closing in on the robotΓÇÖs approach as
+intrusive, responds with physical aggression to the robot.
+12
+
+--- PAGE 19 ---
+The Need for Proxemic Integration:Intent classification identifies
+the behavioral goal; Proxemic analysis determines the socially appro-
+priate interaction distance based on the detected emotional state.
+3.1.4 Closed-Loop Sim-to-Real Tuning
+In this section, the approach is using improvement rather than training once.
+The model is tested within the simulation environment. The issues that arise
+are carefully observed, including failing to recognize a gesture. The simulation
+parameters are varied, including light settings, speed, and noise on the sensor.
+This is done until the model is functioning properly within all scenarios.
+This part of the work helps bridge the difference between simulations and reality.
+Simulations that are too simple for models do not work well on real-world robots.
+By gradually changing the simulated environment closer to real-world conditions
+,the learned behavior can be transferred to the real-world LIMO robot with little
+loss of performance.
+3.1.5 Edge Optimization (TensorRT)
+After this training process, the Transformer modelΓÇÖs speed and size are optimized
+using NVIDIA TensorRT. This step eliminates unnecessary components, optimizes
+calculations for Jetson platforms, and adopts faster data representations with
+equal accuracy. It is very important for safety reasons because a slow processing
+speed can cause the robot to respond late. The model can now run in real time
+on a small computer on board thanks to this optimization.
+3.1.6 Multimodal ΓÇ¥Golden TrialΓÇ¥ Validation
+In this stage, the real world tests are conducted. People interact in the real
+world according to different behavior types, including cooperative behavior, goal-
+oriented movement, mixed behavior, and emergency behavior. This is where the
+robotΓÇÖs understanding of a humanΓÇÖs intention is compared to the actual intention
+of the human. This stage demonstrates that the system is functional not only in
+a simulated environment but also in a real world environment.
+3.2 Data Collection
+ΓÇóMultimodal Dataset Integration:
+ΓÇô Context Model:HARWE dataset, which is used to understand var-
+ious types of social and environmental contexts.
+13
+
+--- PAGE 20 ---
+ΓÇô Emotion Model:RAF-DB and IEMOCAP datasets for emotion Fa-
+cial and Vocal Affect.
+ΓÇô Gesture Model:ChaLearn and BEAT datasets for understanding
+human gestures.
+ΓÇô Motion Model:NTU RGB-D dataset for tracking movement and
+predicting action.
+ΓÇóCreate a dataset involving the generation of synthetic video clips that repli-
+cate different human behavior aspects, such as context, emotion, actions,
+and body movements, which would form the basis for training the four spe-
+cific models. Isaac Sim would be used to create a realistic environment for
+controlling the different virtual scenarios.
+ΓÇóAround 200-300 scenarios will be created in real-world indoor settings in
+order to test the models on real-world scenarios. The data will be captured
+using cameras in order to create a custom dataset that will be used for
+validating the models.
+14
+
+--- PAGE 21 ---
+Chapter 4
+Timeline and Resource Required
+4.1 Timeline
+The following table outlines the project timeline, detailing the phases from project
+selection to final documentation.
+Table 4.1: Project Timeline
+Tasks Dec Jan Feb Mar Apr May Jun Jul Aug
+123412341234123412341234123412341234
+Grouping and Project
+Selection
+Background Study
+Proposal Report Sub-
+mission
+Dataset Generation
+Multimodal Feature
+Extraction
+Cross-Modal Fusion
+Architecture
+Behavior Policy Map-
+ping
+Training and Verifica-
+tion (Simulated Data)
+Verify with Real
+World Data
+Edge Optimization
+(Jetson Nano)
+Testing and Finaliza-
+tion
+Final Documentation
+and Paper
+4.2 Resource Required
+This section outlines the hardware and software resources required for implement-
+ing the multi-cue human intent recognition system with synthetic data generation
+and real-world validation.
+15
+
+--- PAGE 22 ---
+Table 4.2: Required Hardware Resources
+Component Specifications Purpose Qty
+NVIDIA RTX 3090 24GB VRAM, CUDA-
+enabledSynthetic data generation
+(Isaac Sim), model training1
+NVIDIA Jetson
+Orin Nano8GB RAM, edge AI
+computingReal-world deployment and
+validation1
+Intel RealSense
+D455RGB-D camera with
+depth sensingReal-world data capture (emo-
+tion, gesture, motion, context)1
+Table 4.3: Required Software Resources
+Software Version/Details Purpose
+NVIDIA Isaac Sim Latest version with Om-
+niverseSynthetic data generation for multi-
+cue scenarios (distance, proximity,
+speed, human interactions)
+Ubuntu 22.04 LTS Operating system for development
+and deployment
+ROS2 Humble Hawksbill (rec-
+ommended for Ubuntu
+22.04)Robot middleware for sensor inte-
+gration, data processing, and system
+communication
+16
+
+--- PAGE 23 ---
+Chapter 5
+Conclusion
+This project proposes aReal-Time Multimodal Intent-Synthesis Frame-
+workto address theΓÇ¥Behavioral RigidityΓÇ¥ problem of the modern service
+robots. By integrating four primary non-verbal cues of humans such as Emotion,
+Motion, Gesture, and Context, this system moves beyond simple obstacle avoid-
+ance toward a deep understanding of human social intent. The technical core of
+this proposal lies in the shift from rigid rule-based logic to late-fusion transformer
+architecture. This shift allows the robot to use Attention Mechanisms to solve the
+problems ofΓÇ¥Social DissonanceΓÇ¥ andΓÇ¥Semantic AmbiguityΓÇ¥. Also, it allows
+to weight conflicting signals such as an angry face paired with aΓÇ¥ requestingΓÇ¥ ges-
+ture to derive a socially appropriate response. Furthermore, this project mitigates
+theΓÇ¥Reality GapΓÇ¥ by utilizing NVIDIA Isaac Sim and Audio2Face to synthesize
+high-fidelity datasets with automated ground-truth labeling. This ensures that
+the model is trained on complex scenarios that are difficult to capture in the real
+world. The importance of this research is emphasized by its focus on Edge-Native
+Deployment. By optimizing the framework with TensorRT, the project ensures
+that a high-level social intelligence system can run natively on an NVIDIA Jet-
+son Orin Nano with latency below 100ms. This makes the robot responsive and
+safe in high-end environments such as hospitals and retail stores. Ultimately, this
+framework provides theΓÇ¥Social BrainΓÇ¥ for service robots to transition from reac-
+tive machines to proactive, intent-aware collaborators. To ensure the performance
+of these models is grounded in reality, the project culminates in a Real-WorldΓÇ¥
+Golden TrialΓÇ¥ validation. By testing the framework against physical data from
+real human volunteers, we will get the definitive metrics needed to prove the sys-
+tem is reliable in the unpredictable ΓÇ¥Chaotic RealityΓÇ¥ of human interactions.
+This allows to effectively bridge the final gap between simulation and real-world
+deployment.
+17
+
+--- PAGE 24 ---
+References
+[1] M. Argyle,Bodily Communication. London: Methuen, 2 ed., 1988.
+[2] F. Alonso-Martin, M. Malfaz, J. Sequeira, J. F. Gorostiza, and M. A. Salichs,
+ΓÇ£A multimodal emotion detection system during humanΓÇôrobot interaction,ΓÇ¥
+Sensors, vol. 13, no. 11, pp. 15549ΓÇô15581, 2013.
+[3] U. Mamodiya, I. Kishor, A. A. Syed, P. Sankalkar, and N. Naik, ΓÇ£An adaptive
+human-robot interaction framework using real-time emotion recognition and
+context-aware task planning,ΓÇ¥IEEE Access, 2025.
+[4] Z. Su and W. Sheng, ΓÇ£Context-aware conversation adaptation for human-
+robot interaction,ΓÇ¥ in2024 IEEE/RSJ International Conference on Intelli-
+gent Robots and Systems (IROS), pp. 2542ΓÇô2548, IEEE, 2024.
+[5] A. Ahmed and S. Aleem, ΓÇ£Enhancing human-robot collaboration through
+multimodal emotion and context-aware,ΓÇ¥Available at SSRN 5237859, 2025.
+[6] M. Hu, ΓÇ£Research on human-robot interaction technology based on gesture
+recognition,ΓÇ¥Journal of Electronic Research and Application, vol. 9, no. 6,
+2025.
+[7] H. Chen, M. C. Leu, and Z. Yin, ΓÇ£Real-time multi-modal humanΓÇôrobot col-
+laboration using gestures and speech,ΓÇ¥Journal of Manufacturing Science and
+Engineering, vol. 144, no. 10, p. 101007, 2022.
+[8] J. Bamforth,Multimodal Emotion Recognition Software to Facilitate Human-
+Robot Interaction. PhD thesis, Sheffield Hallam University, 2025.
+[9] Z. Lin, F. Cruz, and E. B. Sandoval, ΓÇ£Self context-aware emotion perception
+on human-robot interaction,ΓÇ¥arXiv preprint arXiv:2401.10946, 2024.
+[10] X. Wang, D. Veeramani, F. Dai, and Z. Zhu, ΓÇ£Context-aware hand gesture
+interaction for humanΓÇôrobot collaboration in construction,ΓÇ¥Computer-Aided
+Civil and Infrastructure Engineering, vol. 39, no. 22, pp. 3489ΓÇô3504, 2024.
+[11] Y. Yano, A. Mizutani, Y. Fukuda, D. Kanaoka, T. Ono, and H. Tamukoh,
+ΓÇ£Unified understanding of environment, task, and human for human-robot in-
+teraction in real-world environments,ΓÇ¥ in2024 33rd IEEE International Con-
+ference on Robot and Human Interactive Communication (ROMAN), pp. 224ΓÇô
+230, IEEE, 2024.
+18
+
+--- PAGE 25 ---
+[12] Y. Mohamed, S. Lemaignan, A. Guneysu, P. Jensfelt, and C. Smith, ΓÇ£Fusion
+in context: A multimodal approach to affective state recognition,ΓÇ¥arXiv
+preprint arXiv:2409.11906, 2024.
+[13] Y. Lai, S. Yuan, B. Zhang, B. Kiefer, P. Li, T. Deng, and A. Zell, ΓÇ£Fam-hri:
+Foundation-model assisted multi-modal human-robot interaction combining
+gaze and speech,ΓÇ¥arXiv preprint arXiv:2503.16492, 2025.
+[14] J. Engel, K. Somasundaram, M. Goesele, A. Sun, A. Gamino, A. Turner,
+A. Talattof, A. Yuan, B. Souti, B. Meredith,et al., ΓÇ£Project aria: A new
+tool for egocentric multi-modal ai research,ΓÇ¥arXiv preprint arXiv:2308.13561,
+2023.
+[15] J. Park, P. Kim, and D. Ko, ΓÇ£Real-time open-vocabulary perception for mo-
+bile robots on edge devices: a systematic analysis of the accuracy-latency
+trade-off,ΓÇ¥Frontiers in Robotics and AI, vol. 12, p. 1693988, 2025.
+[16] T. Kim, E. Moon, H. Kang, and H. S. Kim, ΓÇ£Omer-npu: on-device mul-
+timodal emotion recognition on neural processing unit for low latency and
+power consumption,ΓÇ¥Neural Computing and Applications, pp. 1ΓÇô28, 2025.
+[17] W. Zhao, K. Gangaraju, and F. Yuan, ΓÇ£Multimodal perception-driven
+decision-making for human-robot interaction: a survey,ΓÇ¥Frontiers in Robotics
+and AI, vol. 12, p. 1604472, 2025.
+[18] A. Viswanath, L. Veeramacheneni, and H. Buschmeier, ΓÇ£Enhancing explain-
+ability with multimodal context representations for smarter robots,ΓÇ¥arXiv
+preprint arXiv:2503.16467, 2025.
+[19] C. V. Reddy, N. U. Reddy, S. Sharma, J. P. Kumar, S. Lakhanpal, and
+A. Albawi, ΓÇ£Advanced deep learning architectures for real-time human emo-
+tion recognition and behavioral prediction,ΓÇ¥ in2024 International Conference
+on Communication, Computer Sciences and Engineering (IC3SE), pp. 1306ΓÇô
+1311, IEEE, 2024.
+19
+
+================================================================================
+HRI SCENARIOS - ALL PAGES
+================================================================================
+Total pages: 4
+
+--- PAGE 1 ---
+ 
+Core Scenario Table  
+ID Env Scenario  Intent  Emotion  Gesture  Motion  Context  Difficulty  
+C1 Classroom  Student with raised hand, confused  HELP_REQUEST  Sad One hand raised  Stationary  Near desks  Easy  
+C2 Classroom  Student passing with quick wave  NEUTRAL_PASS  Happy  Brief wave  Fast, across  Corridor  Medium  
+C3 Classroom  Teacher pointing at door  GIVE_WAY  Angry  Pointing  Approaching  Doorway  Easy  
+C4 Classroom  Student carrying books  GIVE_WAY  Neutral  None  Slow approach  Near shelves  Easy  
+C5 Classroom  Panicking student  running  EMERGENCY  Fearful  Arms waving  Fast toward robot  Open area  Medium  
+O1 Office  Worker passing with wave  NEUTRAL_PASS  Neutral  Brief wave  Fast, across  Corridor  Medium  
+O2 Office  Worker pointing at blocked shelf  GIVE_WAY  Angry  Pointing  Approaching  Shelf  area  Easy  
+O3 Office  Colleague greeting  GREETING  Happy  Wave  Approach + stop  Open area  Easy  
+O4 Office  Sad worker beckoning  HELP_REQUEST  Sad Beckoning  Stationary  Workstation  Easy  
+O5 Office  Collapsed person reaching  EMERGENCY  Fearful  Reaching  Minimal  Floor  Medium  
+K1 Kitchen  Frustrated cook beckoning  HELP_REQUEST  Angry  Beckoning  Stationary  Counter  Easy  
+K2 Kitchen  Person backing from stove  EMERGENCY  Surprised  Arms up  Backing away  Stove  Medium  
+K3 Kitchen  Cook pointing at cabinet  TASK_ASSIST  Neutral  Pointing  Stationary  Cabinet  Easy  
+K4 Kitchen  Cook carrying pot  GIVE_WAY  Neutral  None  Approaching  Narrow path  Easy  
+K5 Kitchen  Cook walking across  NEUTRAL_PASS  Happy  None  Across  Kitchen  Easy  
+ 
+ 
+ 
+ 
+
+--- PAGE 2 ---
+ 
+Claims Table  
+ID A (All cues)  B (Conflict)  C (Missing cue)  D (Baseline)  
+C1 Γ£ö Γ£ö ΓÇô ΓÇô 
+C2 Γ£ö Γ£ö ΓÇô ΓÇô 
+C3 Γ£ö Γ£ö ΓÇô ΓÇô 
+C4 Γ£ö ΓÇô Γ£ö ΓÇô 
+C5 ΓÇô ΓÇô ΓÇô Γ£ö 
+O1 Γ£ö Γ£ö ΓÇô ΓÇô 
+O2 Γ£ö Γ£ö ΓÇô ΓÇô 
+O3 ΓÇô ΓÇô ΓÇô Γ£ö 
+O4 Γ£ö Γ£ö ΓÇô ΓÇô 
+O5 Γ£ö ΓÇô Γ£ö ΓÇô 
+K1 Γ£ö Γ£ö ΓÇô ΓÇô 
+K2 Γ£ö Γ£ö ΓÇô ΓÇô 
+K3 Γ£ö Γ£ö ΓÇô ΓÇô 
+K4 Γ£ö ΓÇô Γ£ö ΓÇô 
+K5 ΓÇô Γ£ö ΓÇô Γ£ö 
+ 
+ 
+ 
+
+--- PAGE 3 ---
+ 
+Rule -Based Failure vs Fusion Outcome  
+ID Rule -Based Output  Correct (Fusion)  
+C1 STOP / GREETING  HELP_REQUEST  
+C2 GREETING  NEUTRAL_PASS  
+C3 THREAT_AVOIDANCE  GIVE_WAY  
+C4 No action  GIVE_WAY  
+C5 EMERGENCY  EMERGENCY  
+O1 GREETING  NEUTRAL_PASS  
+O2 THREAT_AVOIDANCE  GIVE_WAY  
+O3 GREETING  GREETING  
+O4 Undefined / conflict  HELP_REQUEST  
+O5 No emergency detected  EMERGENCY  
+K1 Undefined / conflict  HELP_REQUEST  
+K2 Ambiguous / neutral  EMERGENCY  
+K3 Navigate only  TASK_ASSIST  
+K4 No action  GIVE_WAY  
+K5 GREETING  NEUTRAL_PASS  
+ 
+ 
+ 
+ 
+
+--- PAGE 4 ---
+ 
+Scenario Purpose Table (Why each exists)  
+Type  Scenarios  
+Conflict (B)  C1, C2, C3, O1, O2, O4, K1, K2, K3, K5  
+Ablation (C)  C4, O5, K4  
+Baseline (D)  C5, O3, K5  
+Flagship  K1 
+ 

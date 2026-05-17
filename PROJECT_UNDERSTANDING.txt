@@ -1,0 +1,311 @@
+============================================================
+    PROJECT UNDERSTANDING GUIDE
+  MCN - Multimodal Cross-Modal Network
+  Adaptive Human-Robot Interaction System
+============================================================
+
+
+==============================
+ WHAT IS THIS PROJECT?
+==============================
+
+This project builds a "Social Brain" for a service robot.
+
+The robot sees a person through a camera and needs to understand:
+  1. WHERE is this? (Classroom? Hospital? Kitchen?)
+  2. HOW does the person FEEL? (Happy? Sad? Angry? Scared?)
+  3. WHAT is the person DOING with hands? (Waving? Pointing? Stop?)
+  4. HOW is the person MOVING? (Walking? Running? Sitting? Approaching?)
+
+By combining ALL 4 answers together, the robot understands the
+INTENT (what the person really wants) and decides what to do.
+
+Example:
+  A person in a CLASSROOM who looks SAD, has ONE HAND UP, and is SITTING
+  = DISTRESSED STUDENT who needs HELP
+  Robot action: Approach gently, speak in supportive tone
+
+Example:
+  A person in a HOSPITAL who looks PANICKED, is WAVING HANDS, and RUNNING
+  = EMERGENCY situation
+  Robot action: Stop, clear path, sound alert
+
+
+==============================
+ WHY NOT JUST USE IF-THEN RULES?
+==============================
+
+Rule-based systems fail because human behavior is messy:
+
+  Problem 1: AMBIGUITY
+    - A raised hand could mean "hello", "help me", or "stop"
+    - Rules can't decide without looking at ALL cues together
+
+  Problem 2: CONFLICTING SIGNALS
+    - Angry face + Waving hand = Frustrated person asking for help
+    - Rule system would crash or give wrong answer
+    - Our fusion model treats this as a UNIQUE state
+
+  Problem 3: NO MEMORY
+    - Rules only see the current moment
+    - Our model remembers the last 1.2 seconds (12 frames)
+    - This helps detect "approaching then stopping" patterns
+
+
+==============================
+ PROJECT STRUCTURE
+==============================
+
+D:\FYP_Tranformer\
+|
+|-- models\                    <-- 4 UPSTREAM AI MODELS
+|   |-- emotion_model.py       (Facial emotion detection using FER library)
+|   |-- gesture_model.py       (Hand gesture detection using MediaPipe Hands)
+|   |-- motion_model.py        (Body motion detection using MediaPipe Pose)
+|   |-- context_model.py       (Scene/environment using MobileNetV3)
+|
+|-- mcn\                       <-- MCN FUSION ENGINE (The "Brain")
+|   |-- config.py              (All settings, categories, vocabulary)
+|   |-- embeddings.py          (Converts text labels to numbers for AI)
+|   |-- temporal_window.py     (Remembers last 12 frames)
+|   |-- dissonance.py          (Handles conflicting signals)
+|   |-- model.py               (The Transformer neural network)
+|   |-- policy_mapper.py       (Converts AI decision to robot command)
+|   |-- dataset.py             (Training data generator)
+|   |-- train.py               (Training the AI model)
+|   |-- inference.py           (Running the AI in real-time)
+|   |-- export_tensorrt.py     (Export for robot hardware)
+|
+|-- pipeline\                  <-- VIDEO PROCESSING PIPELINE
+|   |-- video_pipeline.py      (Connects everything together)
+|
+|-- data\
+|   |-- scenarios.json         (All 18 scenario definitions)
+|
+|-- tests\                     <-- TESTING
+|   |-- test_model.py          (Tests for MCN)
+|   |-- test_pipeline.py       (Tests for full pipeline)
+|
+|-- testVideos\                <-- PUT YOUR TEST VIDEOS HERE
+|
+|-- run_video.py               <-- MAIN ENTRY POINT (run this!)
+|-- requirements.txt           <-- Package list
+|-- HOW_TO_RUN.txt             <-- How to run guide
+|-- env\                       <-- Python virtual environment
+
+
+==============================
+ HOW THE PIPELINE WORKS
+==============================
+
+Step-by-step for EACH video frame:
+
+  VIDEO FRAME (camera image)
+       |
+       |--- [1] Context Model (MobileNetV3)
+       |         Looks at the whole scene
+       |         Output: "Classroom" (92% sure)
+       |
+       |--- [2] Emotion Model (FER + MTCNN)
+       |         Finds the face, reads expression
+       |         Output: "Sad" (89% sure)
+       |
+       |--- [3] Gesture Model (MediaPipe Hands)
+       |         Finds hands, counts fingers, checks position
+       |         Output: "One Hand Up" (93% sure)
+       |
+       |--- [4] Motion Model (MediaPipe Pose)
+       |         Tracks body skeleton, measures speed
+       |         Output: "Sitting" (97% sure)
+       |
+       v
+  MCN FUSION ENGINE (Transformer Neural Network)
+       |
+       |  Combines all 4 inputs using ATTENTION mechanism
+       |  Looks at the last 12 frames (1.2 seconds of history)
+       |  Detects any conflicts between signals
+       |  Classifies the scenario
+       |
+       v
+  OUTPUT:
+    {
+      "predicted_intent": "DISTRESSED_STUDENT_QUERY",
+      "scenario_id": "SCENARIO_ID_74",
+      "behavioral_policy": {
+        "proxemic_action": "APPROACH_AND_ENGAGE",
+        "target_linear_velocity": 0.15,
+        "social_buffer_zone_radius": 1.5,
+        "vocal_affect_tone": "GENTLE_SUPPORTIVE"
+      }
+    }
+
+
+==============================
+ THE 4 AI MODELS EXPLAINED
+==============================
+
+MODEL 1: EMOTION (emotion_model.py)
+  Technology: FER library (pip install fer)
+  How it works:
+    1. MTCNN detects faces in the image
+    2. Crops the face region
+    3. Mini-Xception CNN classifies emotion
+    4. Returns: happy, sad, angry, fear, surprise, neutral, disgust
+  We map these to our vocabulary:
+    fear -> Panicked/Fearful
+    disgust -> Hostile
+    fear+surprise combined -> Panicked
+
+MODEL 2: GESTURE (gesture_model.py)
+  Technology: MediaPipe Hands
+  How it works:
+    1. Detects hands in the image
+    2. Returns 21 3D landmark points per hand
+    3. We count which fingers are extended
+    4. We check hand position (high/low in frame)
+    5. We track wrist movement over time for waving
+  Finger counting:
+    Only index up = Pointing
+    All 5 up = Open Palm or Stop Signal
+    Index+Middle up = Beckoning
+
+MODEL 3: MOTION (motion_model.py)
+  Technology: MediaPipe Pose
+  How it works:
+    1. Detects body with 33 landmark points
+    2. Tracks hip center position between frames = velocity
+    3. Measures knee angle to detect sitting
+    4. Tracks body bounding box size:
+       Getting bigger = Approaching
+       Getting smaller = Leaving
+    5. Checks if horizontal movement = Passing Across
+
+MODEL 4: CONTEXT (context_model.py)
+  Technology: MobileNetV3-Small (PyTorch, ImageNet trained)
+  How it works:
+    1. Runs MobileNetV3 to identify objects in scene
+    2. Maps detected objects to environments:
+       desk+monitor = Office/Classroom
+       stove+pot = Kitchen
+       stretcher+mask = Hospital
+    3. Also checks color (white = clinical) and edges (many = structured)
+    Note: This model needs fine-tuning for best accuracy
+
+
+==============================
+ THE MCN TRANSFORMER EXPLAINED
+==============================
+
+The MCN is the "brain" that combines all 4 model outputs.
+
+Key numbers:
+  - Parameters: 115,279 (very small, runs on robot hardware)
+  - Input: 48 tokens (12 frames x 4 modalities)
+  - Dimension: 64
+  - Attention heads: 4 (one per modality conceptually)
+  - Layers: 3
+  - Inference time: ~3ms on CPU
+
+How it works:
+  1. EMBEDDING: Each category label (like "Sad") becomes a 32-dim vector
+     Each confidence score (like 0.89) becomes a 32-dim vector
+     Combined = 64-dim token per modality per frame
+
+  2. TEMPORAL WINDOW: Last 12 frames are kept in memory
+     This creates 48 tokens (12 frames x 4 modalities)
+
+  3. SELF-ATTENTION: The transformer lets EVERY token look at
+     EVERY other token. This means:
+     - Emotion at frame 5 can attend to Motion at frame 10
+     - Context can weight Gesture differently based on the scene
+     - This is NOT if-then rules, it's learned weighting
+
+  4. DISSONANCE DETECTION: A special head detects conflicts:
+     - Angry face + Waving hand = EMOTION_GESTURE_CONFLICT
+     - This conflict info is ADDED to the features (not an error!)
+     - The model learns that "Angry+Wave" = frustrated help request
+
+  5. INTENT CLASSIFICATION: Final layer outputs probability for each
+     of the 9 intent categories
+
+  6. POLICY MAPPING: The classified intent maps to a robot behavior:
+     HELP_REQUEST -> approach gently at 0.2 m/s, buffer 1.5m
+     EMERGENCY -> stop immediately, buffer 3.0m, alert
+     HOSTILE_CONFRONTATION -> retreat slowly, buffer 3.5m, de-escalate
+
+
+==============================
+ THE 18 SCENARIOS
+==============================
+
+From the HRI_Scenarios.pdf:
+
+CLASSROOM:
+  C1: Student raised hand + confused -> HELP_REQUEST
+  C2: Student passing + quick wave -> NEUTRAL_PASS
+  C3: Teacher pointing at door -> GIVE_WAY
+  C4: Student carrying books -> GIVE_WAY
+  C5: Panicking student running -> EMERGENCY
+
+OFFICE:
+  O1: Worker passing with wave -> NEUTRAL_PASS
+  O2: Worker pointing at blocked shelf -> GIVE_WAY
+  O3: Colleague greeting -> GREETING
+  O4: Sad worker beckoning -> HELP_REQUEST
+  O5: Collapsed person reaching -> EMERGENCY
+
+KITCHEN:
+  K1: Frustrated cook beckoning -> HELP_REQUEST  (FLAGSHIP SCENARIO!)
+  K2: Person backing from stove -> EMERGENCY
+  K3: Cook pointing at cabinet -> TASK_ASSIST
+  K4: Cook carrying pot -> GIVE_WAY
+  K5: Cook walking across -> NEUTRAL_PASS
+
+ADDITIONAL (from system prompt):
+  H1: Distressed student in classroom -> DISTRESSED_STUDENT_QUERY
+  H2: Panicked person in hospital -> EMERGENCY
+  H3: Hostile person in clinic -> HOSTILE_CONFRONTATION
+
+WHY K1 IS FLAGSHIP:
+  An angry person beckoning = the rule-based system says "conflict/error"
+  But our fusion model correctly identifies: frustrated person who needs help!
+  This proves the value of multimodal fusion over rules.
+
+
+==============================
+ DEPLOYMENT ON ROBOT
+==============================
+
+Target hardware: NVIDIA Jetson Orin Nano (8GB RAM)
+
+Steps:
+  1. Train MCN on your PC (python -m mcn.train)
+  2. Export to ONNX (python -m mcn.export_tensorrt --checkpoint ...)
+  3. Transfer ONNX file to Jetson
+  4. Convert to TensorRT on Jetson (convert_tensorrt.sh)
+  5. Run MCN inference at 10Hz on the robot
+
+Target performance: <100ms per frame on Jetson
+
+ROS2 Integration:
+  - MCN runs as a ROS2 node
+  - Subscribes to: /camera/image, /upstream/emotion, etc.
+  - Publishes to: /robot/behavioral_policy (JSON)
+  - Nav2 stack reads the policy for robot movement
+
+
+==============================
+ KEY TERMINOLOGY
+==============================
+
+MCN = Multimodal Cross-Modal Network (the fusion brain)
+HRI = Human-Robot Interaction
+Late Fusion = Combining model outputs (not raw images)
+Self-Attention = Each input can look at all other inputs
+Proxemic = Rules about personal space / social distance
+Dissonance = Conflicting signals (angry face + friendly wave)
+TensorRT = NVIDIA's tool to make AI models run fast on GPU
+ONNX = Universal AI model format (works on any hardware)
+FER = Facial Expression Recognition
+MediaPipe = Google's library for body/hand tracking
+
