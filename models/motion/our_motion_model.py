@@ -1,77 +1,90 @@
-import torch
 import cv2
 import numpy as np
-from typing import Dict, List
-import torchvision.transforms as transforms
-import os
 import sys
+import os
+from typing import Dict, List
 
 from models.__init__ import UpstreamModel
 from mcn.config import MOTION_CATEGORIES
 
 class OurMotionModel(UpstreamModel):
-    def __init__(self, model_path="ourModelsprojects/motion/checkpoints/model_v1.pth", device=None):
-        if device is None:
-            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        else:
-            self.device = torch.device(device)
-            
+    """
+    Custom Motion Model wrapper that natively uses the MediaPipe + ResNet50 logic 
+    from your action_recognizer.py inside ourModelsprojects/motion.
+    """
+    def __init__(self, use_resnet=False):
         self.categories = MOTION_CATEGORIES
-        self.model = None
+        self.frame_idx = 0
+        
+        # Add the folder to the path so we can import your action_recognizer
+        sys.path.insert(0, os.path.abspath("ourModelsprojects/motion"))
         
         try:
-            # Try to load the custom model architecture from ourModelsprojects
-            sys.path.insert(0, os.path.abspath("ourModelsprojects/motion"))
-            try:
-                from models.custom_motion import get_model
-                self.model = get_model()
-            except ImportError:
-                # Default architecture if not found
-                import torchvision.models as models
-                import torch.nn as nn
-                self.model = models.mobilenet_v2(pretrained=False)
-                self.model.classifier[1] = nn.Linear(self.model.last_channel, len(self.categories))
-
-            if os.path.exists(model_path):
-                self.model.load_state_dict(torch.load(model_path, map_location=self.device))
-                print(f"[OurMotionModel] Loaded weights from {model_path}")
-            else:
-                print(f"[OurMotionModel] Weights not found at {model_path}. Using uninitialized weights.")
+            import mediapipe as mp
+            self.mp_pose = mp.solutions.pose
+            self.pose_tracker = self.mp_pose.Pose(
+                min_detection_confidence=0.5,
+                min_tracking_confidence=0.5,
+                model_complexity=1,
+            )
+            
+            from action_recognizer import MotionAnalyser, PoseClassifier
+            self.motion_analyser = MotionAnalyser()
+            self.pose_classifier = PoseClassifier()
+            
+            # Optional: Load the ResNet50 Stanford40 model
+            self.use_resnet = use_resnet
+            if self.use_resnet:
+                from action_recognizer import ActionModel
+                self.action_model = ActionModel()
+                self.action_model.load()
+                
+            self.loaded = True
+            print("[OurMotionModel] Successfully hooked into MediaPipe + ResNet50 logic!")
         except Exception as e:
-            print(f"[OurMotionModel] Error initializing model: {e}")
-
-        if self.model:
-            self.model.to(self.device)
-            self.model.eval()
-
-        self.transform = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ])
+            print(f"[OurMotionModel] Error loading custom logic: {e}")
+            self.loaded = False
 
     def predict(self, frame: np.ndarray) -> Dict[str, object]:
-        if self.model is None:
+        if not self.loaded:
             return {"state": "Stationary", "confidence": 0.0}
             
+        self.frame_idx += 1
+        
         try:
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            input_tensor = self.transform(rgb).unsqueeze(0).to(self.device)
+            rgb.flags.writeable = False
+            results = self.pose_tracker.process(rgb)
             
-            with torch.no_grad():
-                outputs = self.model(input_tensor)
-                probs = torch.softmax(outputs, dim=1)[0]
+            landmarks = results.pose_landmarks
+            
+            # Use your custom logic to get the motion label
+            motion_label = self.motion_analyser.update(landmarks, self.frame_idx)
+            pose_label = self.pose_classifier.classify(landmarks)
+            
+            # Just to map sitting if needed, though motion_label handles most
+            if pose_label == "Sitting" and motion_label in ["Stationary", "Minimal"]:
+                motion_label = "Sitting"
                 
-            conf, idx = torch.max(probs, dim=0)
-            state = self.categories[idx.item()]
+            # If using ResNet50, we could merge action_label logic here, 
+            # but MCN's categories primarily expect the motion_label values.
+            if self.use_resnet and self.frame_idx % 10 == 0:
+                action_label = self.action_model.predict(rgb)
+                
+            # Default confidence since your heuristic doesn't output probabilities
+            confidence = 0.85 if landmarks else 0.4
             
-            return {"state": state, "confidence": round(float(conf.cpu()), 3)}
+            # Ensure it strictly matches MCN categories
+            if motion_label not in self.categories:
+                motion_label = "Stationary"
+            
+            return {"state": motion_label, "confidence": confidence}
+            
         except Exception as e:
             return {"state": "Stationary", "confidence": 0.0}
 
     def get_name(self) -> str:
-        return "Our Motion Model (Custom)"
+        return "Our Motion Model (MediaPipe + ResNet50)"
 
     def get_categories(self) -> List[str]:
         return self.categories

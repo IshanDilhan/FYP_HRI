@@ -52,21 +52,21 @@ class VideoPipeline:
         print("[Pipeline] Initializing models...")
 
         # Initialize 4 upstream models
-        print("  Loading Emotion Model (FER)...")
-        from models.emotion_model import EmotionModel
-        self.emotion_model = EmotionModel(use_mtcnn=use_mtcnn)
+        print("  Loading Custom Emotion Model...")
+        from models.emotion.our_emotion_model import OurEmotionModel
+        self.emotion_model = OurEmotionModel()
 
-        print("  Loading Gesture Model (MediaPipe Hands)...")
-        from models.gesture_model import GestureModel
-        self.gesture_model = GestureModel()
+        print("  Loading Custom Gesture Model...")
+        from models.gesture.our_gesture_model import OurGestureModel
+        self.gesture_model = OurGestureModel()
 
-        print("  Loading Motion Model (MediaPipe Pose)...")
-        from models.motion_model import MotionModel
-        self.motion_model = MotionModel()
+        print("  Loading Custom Motion Model (MediaPipe + ResNet50)...")
+        from models.motion.our_motion_model import OurMotionModel
+        self.motion_model = OurMotionModel(use_resnet=True)
 
-        print("  Loading Context Model (MobileNetV3)...")
-        from models.context_model import ContextModel
-        self.context_model = ContextModel(device=device)
+        print("  Loading Custom Context Model...")
+        from models.context.our_context_model import OurContextModel
+        self.context_model = OurContextModel()
 
         # Initialize MCN fusion engine
         print("  Loading MCN Fusion Engine...")

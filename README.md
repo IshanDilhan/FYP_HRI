@@ -110,6 +110,7 @@ python -m mcn.train
 │   └── context_model.py     # MobileNetV3 Context
 ├── pipeline/                # Real-time orchestration
 │   └── video_pipeline.py    # Merges 4 models -> MCN -> Video Overlay
+├── docs/                    # Project documentation, diagrams, and notes
 ├── tests/                   # Unit Tests
 ├── testVideos/              # Put your video files here (ignored by Git)
 ├── checkpoints/             # Trained MCN weights (ignored by Git)
@@ -121,13 +122,11 @@ python -m mcn.train
 
 ---
 
-## 🤖 Robot Hardware Deployment (Jetson)
+## 🤖 Robot Hardware Deployment (Jetson & ROS2)
 
-The MCN is designed to run on the **NVIDIA Jetson Orin Nano** via TensorRT.
+The MCN is designed to run on platforms like the **NVIDIA Jetson Orin Nano** via TensorRT.
 
-1. Export the trained `.pt` model to ONNX:
-```bash
-python -m mcn.export_tensorrt --checkpoint checkpoints/best_model.pt
-```
-2. Transfer the ONNX file to the Jetson platform.
-3. Run the generated bash script to compile the TensorRT engine for low-latency ROS2 node execution.
+Please refer to the complete, step-by-step [Deployment Plan](docs/deployment_plan.md) for instructions on:
+1. Exporting the PyTorch models to ONNX and TensorRT `.engine` files.
+2. Integrating the `VideoPipeline` into a **ROS2 Node** (subscribing to `/camera/color/image_raw`).
+3. Publishing the MCN JSON Intent mapping to the ROS2 Navigation Stack.

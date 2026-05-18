@@ -24,3 +24,4 @@ protobuf==3.20.3
 
 # Utilities
 numpy<2.0.0
+huggingface_hub
