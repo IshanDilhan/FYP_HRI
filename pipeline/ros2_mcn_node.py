@@ -84,6 +84,15 @@ class MCNPolicyNode(Node):
                                f"| {result['fps']:.0f}fps")
                 sys.stdout.flush()
                 
+            # If a graphical display environment is active, show the live annotated video feed!
+            if "DISPLAY" in os.environ:
+                try:
+                    annotated_frame = self.pipeline.draw_overlay(cv_image, result)
+                    cv2.imshow("MCN ROS2 - Live Fused Robot Feed", annotated_frame)
+                    cv2.waitKey(1)
+                except Exception:
+                    pass
+                
         except Exception as e:
             sys.stdout.write(f"\n[Error] Failed to process frame: {e}\n")
             sys.stdout.flush()
