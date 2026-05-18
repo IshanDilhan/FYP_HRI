@@ -20,8 +20,8 @@ class OurMotionModel(UpstreamModel):
         sys.path.insert(0, os.path.abspath("ourModelsprojects/motion"))
         
         try:
-            import mediapipe as mp
-            self.mp_pose = mp.solutions.pose
+            import mediapipe.python.solutions.pose as mp_pose
+            self.mp_pose = mp_pose
             self.pose_tracker = self.mp_pose.Pose(
                 min_detection_confidence=0.5,
                 min_tracking_confidence=0.5,
