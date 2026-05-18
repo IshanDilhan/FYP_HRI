@@ -1,7 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import numpy as np
-import tensorflow as tf
+
+try:
+    import tensorflow as tf
+except ImportError:
+    import tflite_runtime.interpreter as tflite
+    class tf:
+        class lite:
+            Interpreter = tflite.Interpreter
+
 
 
 class KeyPointClassifier(object):
