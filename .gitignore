@@ -64,7 +64,7 @@ ourModelsprojects/**/testVideos/
 ourModelsprojects/**/output/
 ourModelsprojects/**/*.pth
 ourModelsprojects/**/*.pt
-ourModelsprojects/**/*.tflite
+!ourModelsprojects/**/*.tflite
 ourModelsprojects/**/*.mp4
 ourModelsprojects/**/*.avi
 

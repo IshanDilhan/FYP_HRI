@@ -34,17 +34,18 @@ class OurGestureModel(UpstreamModel):
             # KeyPointClassifier is hardcoded to look for "model/..." in its constructor
             # We must change cwd temporarily or pass the path. But it uses relative paths.
             original_cwd = os.getcwd()
-            os.chdir(os.path.abspath("ourModelsprojects/gesture/gesture_detection"))
-            
-            self.keypoint_classifier = KeyPointClassifier()
-            self.point_history_classifier = PointHistoryClassifier()
-            
-            # Read labels
-            import csv
-            with open('model/keypoint_classifier/keypoint_classifier_label.csv', encoding='utf-8-sig') as f:
-                self.keypoint_labels = [row[0] for row in csv.reader(f)]
+            try:
+                os.chdir(os.path.abspath("ourModelsprojects/gesture/gesture_detection"))
                 
-            os.chdir(original_cwd)
+                self.keypoint_classifier = KeyPointClassifier()
+                self.point_history_classifier = PointHistoryClassifier()
+                
+                # Read labels
+                import csv
+                with open('model/keypoint_classifier/keypoint_classifier_label.csv', encoding='utf-8-sig') as f:
+                    self.keypoint_labels = [row[0] for row in csv.reader(f)]
+            finally:
+                os.chdir(original_cwd)
             
             self.history_length = 16
             self.point_history = {0: deque(maxlen=self.history_length), 1: deque(maxlen=self.history_length)}
