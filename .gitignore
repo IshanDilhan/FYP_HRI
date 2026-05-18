@@ -29,7 +29,10 @@ share/python-wheels/
 MANIFEST
 
 # Videos & Checkpoints
-testVideos/
+testVideos/*
+!testVideos/1.mp4
+TestVideos/*
+!TestVideos/1.mp4
 checkpoints/*
 !checkpoints/best_model.pt
 *.pt
