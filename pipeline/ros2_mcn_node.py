@@ -74,11 +74,19 @@ class MCNPolicyNode(Node):
                 policy_msg.data = json.dumps(policy)
                 self.publisher.publish(policy_msg)
                 
-                intent = policy.get("predicted_intent", "UNKNOWN")
-                self.get_logger().info(f"Published Policy for Intent: {intent}")
+                # Beautiful, real-time interactive terminal logs (matching select_and_run.py)
+                progress = f"[Frame {self.frame_count}]"
+                sys.stdout.write(f"\r{progress} {policy['predicted_intent']:28s} "
+                               f"({policy['intent_probability']:.0%}) | "
+                               f"E:{result['emotion']['state']:10s} "
+                               f"G:{result['gesture']['state']:15s} "
+                               f"M:{result['motion']['state']:15s} "
+                               f"| {result['fps']:.0f}fps")
+                sys.stdout.flush()
                 
         except Exception as e:
-            self.get_logger().error(f"Error processing frame: {e}")
+            sys.stdout.write(f"\n[Error] Failed to process frame: {e}\n")
+            sys.stdout.flush()
 
 def main(args=None):
     rclpy.init(args=args)
