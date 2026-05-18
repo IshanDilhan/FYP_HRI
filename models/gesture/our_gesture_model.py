@@ -18,12 +18,12 @@ class OurGestureModel(UpstreamModel):
         sys.path.insert(0, os.path.abspath("ourModelsprojects/gesture/gesture_detection"))
         
         try:
-            import mediapipe.python.solutions.hands as mp_hands
+            import mediapipe as mp
             from model import KeyPointClassifier, PointHistoryClassifier
             import app as gesture_app # Import their app.py to use its helper functions
             
             self.gesture_app = gesture_app
-            self.mp_hands = mp_hands
+            self.mp_hands = mp.solutions.hands
             self.hands = self.mp_hands.Hands(
                 static_image_mode=False,
                 max_num_hands=2,
