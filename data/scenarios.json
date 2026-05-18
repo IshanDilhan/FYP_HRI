@@ -1,0 +1,313 @@
+{
+  "version": "1.0",
+  "description": "HRI Scenario definitions for the Multimodal Cross-Modal Network",
+  "source": "HRI_Scenarios.pdf + System Prompt specifications",
+  "scenarios": [
+    {
+      "id": "C1",
+      "environment": "Classroom",
+      "scenario_name": "Student with raised hand, confused",
+      "intent": "HELP_REQUEST",
+      "trigger_cues": {
+        "emotion": "Sad",
+        "gesture": "One Hand Up",
+        "motion": "Stationary",
+        "context_detail": "Near desks"
+      },
+      "difficulty": "Easy",
+      "test_type": "Conflict",
+      "rule_based_output": "STOP / GREETING",
+      "fusion_correct_output": "HELP_REQUEST",
+      "notes": "Rule-based fails because raised hand + sad face is ambiguous without fusion"
+    },
+    {
+      "id": "C2",
+      "environment": "Classroom",
+      "scenario_name": "Student passing with quick wave",
+      "intent": "NEUTRAL_PASS",
+      "trigger_cues": {
+        "emotion": "Happy",
+        "gesture": "Brief Wave",
+        "motion": "Fast Across",
+        "context_detail": "Corridor"
+      },
+      "difficulty": "Medium",
+      "test_type": "Conflict",
+      "rule_based_output": "GREETING",
+      "fusion_correct_output": "NEUTRAL_PASS",
+      "notes": "Wave + fast movement = passing, not engaging"
+    },
+    {
+      "id": "C3",
+      "environment": "Classroom",
+      "scenario_name": "Teacher pointing at door",
+      "intent": "GIVE_WAY",
+      "trigger_cues": {
+        "emotion": "Angry",
+        "gesture": "Pointing",
+        "motion": "Approaching",
+        "context_detail": "Doorway"
+      },
+      "difficulty": "Easy",
+      "test_type": "Conflict",
+      "rule_based_output": "THREAT_AVOIDANCE",
+      "fusion_correct_output": "GIVE_WAY",
+      "notes": "Angry + pointing could seem hostile, but context (doorway) indicates give way"
+    },
+    {
+      "id": "C4",
+      "environment": "Classroom",
+      "scenario_name": "Student carrying books",
+      "intent": "GIVE_WAY",
+      "trigger_cues": {
+        "emotion": "Neutral",
+        "gesture": "No Gesture",
+        "motion": "Slow Approach",
+        "context_detail": "Near shelves"
+      },
+      "difficulty": "Easy",
+      "test_type": "Ablation",
+      "rule_based_output": "No action",
+      "fusion_correct_output": "GIVE_WAY",
+      "notes": "Missing gesture cue; motion + context sufficient for fusion model"
+    },
+    {
+      "id": "C5",
+      "environment": "Classroom",
+      "scenario_name": "Panicking student running",
+      "intent": "EMERGENCY",
+      "trigger_cues": {
+        "emotion": "Fearful",
+        "gesture": "Arms Waving",
+        "motion": "Fast Toward Robot",
+        "context_detail": "Open area"
+      },
+      "difficulty": "Medium",
+      "test_type": "Baseline",
+      "rule_based_output": "EMERGENCY",
+      "fusion_correct_output": "EMERGENCY",
+      "notes": "Clear emergency - both rule-based and fusion agree"
+    },
+    {
+      "id": "O1",
+      "environment": "Office",
+      "scenario_name": "Worker passing with wave",
+      "intent": "NEUTRAL_PASS",
+      "trigger_cues": {
+        "emotion": "Neutral",
+        "gesture": "Brief Wave",
+        "motion": "Fast Across",
+        "context_detail": "Corridor"
+      },
+      "difficulty": "Medium",
+      "test_type": "Conflict",
+      "rule_based_output": "GREETING",
+      "fusion_correct_output": "NEUTRAL_PASS",
+      "notes": "Wave is casual acknowledgment, not engagement"
+    },
+    {
+      "id": "O2",
+      "environment": "Office",
+      "scenario_name": "Worker pointing at blocked shelf",
+      "intent": "GIVE_WAY",
+      "trigger_cues": {
+        "emotion": "Angry",
+        "gesture": "Pointing",
+        "motion": "Approaching",
+        "context_detail": "Shelf area"
+      },
+      "difficulty": "Easy",
+      "test_type": "Conflict",
+      "rule_based_output": "THREAT_AVOIDANCE",
+      "fusion_correct_output": "GIVE_WAY",
+      "notes": "Angry + pointing at shelf = frustrated about blocked path"
+    },
+    {
+      "id": "O3",
+      "environment": "Office",
+      "scenario_name": "Colleague greeting",
+      "intent": "GREETING",
+      "trigger_cues": {
+        "emotion": "Happy",
+        "gesture": "Hand Waving",
+        "motion": "Approach And Stop",
+        "context_detail": "Open area"
+      },
+      "difficulty": "Easy",
+      "test_type": "Baseline",
+      "rule_based_output": "GREETING",
+      "fusion_correct_output": "GREETING",
+      "notes": "Clear greeting - all cues aligned"
+    },
+    {
+      "id": "O4",
+      "environment": "Office",
+      "scenario_name": "Sad worker beckoning",
+      "intent": "HELP_REQUEST",
+      "trigger_cues": {
+        "emotion": "Sad",
+        "gesture": "Beckoning",
+        "motion": "Stationary",
+        "context_detail": "Workstation"
+      },
+      "difficulty": "Easy",
+      "test_type": "Conflict",
+      "rule_based_output": "Undefined / conflict",
+      "fusion_correct_output": "HELP_REQUEST",
+      "notes": "Sad + beckoning = needs help but rule-based can't resolve"
+    },
+    {
+      "id": "O5",
+      "environment": "Office",
+      "scenario_name": "Collapsed person reaching",
+      "intent": "EMERGENCY",
+      "trigger_cues": {
+        "emotion": "Fearful",
+        "gesture": "Reaching",
+        "motion": "Minimal",
+        "context_detail": "Floor"
+      },
+      "difficulty": "Medium",
+      "test_type": "Ablation",
+      "rule_based_output": "No emergency detected",
+      "fusion_correct_output": "EMERGENCY",
+      "notes": "Rule-based misses emergency because motion is minimal (person is on floor)"
+    },
+    {
+      "id": "K1",
+      "environment": "Kitchen",
+      "scenario_name": "Frustrated cook beckoning",
+      "intent": "HELP_REQUEST",
+      "trigger_cues": {
+        "emotion": "Angry",
+        "gesture": "Beckoning",
+        "motion": "Stationary",
+        "context_detail": "Counter"
+      },
+      "difficulty": "Easy",
+      "test_type": "Conflict",
+      "rule_based_output": "Undefined / conflict",
+      "fusion_correct_output": "HELP_REQUEST",
+      "notes": "FLAGSHIP SCENARIO: Angry + beckoning = frustrated help request, not hostility"
+    },
+    {
+      "id": "K2",
+      "environment": "Kitchen",
+      "scenario_name": "Person backing from stove",
+      "intent": "EMERGENCY",
+      "trigger_cues": {
+        "emotion": "Surprised",
+        "gesture": "Arms Up",
+        "motion": "Backing Away",
+        "context_detail": "Stove"
+      },
+      "difficulty": "Medium",
+      "test_type": "Conflict",
+      "rule_based_output": "Ambiguous / neutral",
+      "fusion_correct_output": "EMERGENCY",
+      "notes": "Surprised + backing from stove = kitchen emergency"
+    },
+    {
+      "id": "K3",
+      "environment": "Kitchen",
+      "scenario_name": "Cook pointing at cabinet",
+      "intent": "TASK_ASSIST",
+      "trigger_cues": {
+        "emotion": "Neutral",
+        "gesture": "Pointing",
+        "motion": "Stationary",
+        "context_detail": "Cabinet"
+      },
+      "difficulty": "Easy",
+      "test_type": "Conflict",
+      "rule_based_output": "Navigate only",
+      "fusion_correct_output": "TASK_ASSIST",
+      "notes": "Pointing at object + neutral = task assistance request"
+    },
+    {
+      "id": "K4",
+      "environment": "Kitchen",
+      "scenario_name": "Cook carrying pot",
+      "intent": "GIVE_WAY",
+      "trigger_cues": {
+        "emotion": "Neutral",
+        "gesture": "No Gesture",
+        "motion": "Approaching",
+        "context_detail": "Narrow path"
+      },
+      "difficulty": "Easy",
+      "test_type": "Ablation",
+      "rule_based_output": "No action",
+      "fusion_correct_output": "GIVE_WAY",
+      "notes": "No gesture but narrow path + approaching = yield"
+    },
+    {
+      "id": "K5",
+      "environment": "Kitchen",
+      "scenario_name": "Cook walking across",
+      "intent": "NEUTRAL_PASS",
+      "trigger_cues": {
+        "emotion": "Happy",
+        "gesture": "No Gesture",
+        "motion": "Passing Across",
+        "context_detail": "Kitchen"
+      },
+      "difficulty": "Easy",
+      "test_type": "Baseline",
+      "rule_based_output": "GREETING",
+      "fusion_correct_output": "NEUTRAL_PASS",
+      "notes": "Happy face but no gesture + passing = neutral pass, not greeting"
+    },
+    {
+      "id": "H1",
+      "environment": "Classroom",
+      "scenario_name": "Distressed Student Query",
+      "intent": "DISTRESSED_STUDENT_QUERY",
+      "trigger_cues": {
+        "emotion": "Sad",
+        "gesture": "One Hand Up",
+        "motion": "Sitting",
+        "context_detail": "Classroom desk"
+      },
+      "difficulty": "Easy",
+      "test_type": "Conflict",
+      "rule_based_output": "STOP / GREETING",
+      "fusion_correct_output": "DISTRESSED_STUDENT_QUERY",
+      "notes": "From system prompt SCENARIO_ID_74"
+    },
+    {
+      "id": "H2",
+      "environment": "Hospital",
+      "scenario_name": "Emergency Evacuation Signal",
+      "intent": "EMERGENCY",
+      "trigger_cues": {
+        "emotion": "Panicked",
+        "gesture": "Hand Waving",
+        "motion": "Running",
+        "context_detail": "Hospital corridor"
+      },
+      "difficulty": "Medium",
+      "test_type": "Conflict",
+      "rule_based_output": "GREETING",
+      "fusion_correct_output": "EMERGENCY",
+      "notes": "From system prompt SCENARIO_ID_88"
+    },
+    {
+      "id": "H3",
+      "environment": "Clinic",
+      "scenario_name": "Hostile Confrontation De-escalation",
+      "intent": "HOSTILE_CONFRONTATION",
+      "trigger_cues": {
+        "emotion": "Hostile",
+        "gesture": "Pointing",
+        "motion": "Approaching",
+        "context_detail": "Clinic reception"
+      },
+      "difficulty": "Hard",
+      "test_type": "Conflict",
+      "rule_based_output": "THREAT_AVOIDANCE",
+      "fusion_correct_output": "HOSTILE_CONFRONTATION",
+      "notes": "From system prompt SCENARIO_ID_99"
+    }
+  ]
+}
