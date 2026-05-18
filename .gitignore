@@ -30,7 +30,7 @@ MANIFEST
 
 # Videos & Checkpoints
 testVideos/
-checkpoints/
+checkpoints/*
 !checkpoints/best_model.pt
 *.pt
 !mcn_model.onnx
