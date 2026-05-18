@@ -57,7 +57,12 @@ Place your test video files (`.mp4`, `.avi`, etc.) inside a folder named `testVi
 ```bash
 python select_and_run.py
 ```
-This will open an interactive menu allowing you to process individual videos or batch-process them all.
+This will open an interactive menu allowing you to quickly process individual videos or batch-process them all without saving the output.
+
+If you also want to save the output annotated video to the `testVideos/` folder, run:
+```bash
+python select_and_save.py
+```
 
 ### Option B: Run on Live Webcam
 ```bash
@@ -95,6 +100,10 @@ python -m mcn.train
 │   ├── policy_mapper.py     # Maps Intent -> ROS2 JSON Actions
 │   └── train.py             # Training loop
 ├── models/                  # Upstream Vision Models
+│   ├── emotion/             # Custom Emotion Model wrapper (ourModelsprojects)
+│   ├── gesture/             # Custom Gesture Model wrapper (ourModelsprojects)
+│   ├── motion/              # Custom Motion Model wrapper (ourModelsprojects)
+│   ├── context/             # Custom Context Model wrapper (ourModelsprojects)
 │   ├── emotion_model.py     # FER
 │   ├── gesture_model.py     # MediaPipe Hands
 │   ├── motion_model.py      # MediaPipe Pose
@@ -105,7 +114,8 @@ python -m mcn.train
 ├── testVideos/              # Put your video files here (ignored by Git)
 ├── checkpoints/             # Trained MCN weights (ignored by Git)
 ├── run_video.py             # CLI entry point
-├── select_and_run.py        # Interactive UI entry point
+├── select_and_run.py        # Interactive UI entry point (no save)
+├── select_and_save.py       # Interactive UI entry point (saves output)
 └── requirements.txt         # Locked dependency file
 ```
 

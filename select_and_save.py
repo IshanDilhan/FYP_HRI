@@ -1,11 +1,12 @@
 """
-Interactive menu to select and run a test video.
+Interactive menu to select and run a test video, AND SAVE the output video.
 Lists all videos in the testVideos folder and lets you choose one.
+The output will be saved with '_MCN_result' appended to the filename.
 
 Usage:
     cd D:\FYP_Tranformer
     .\env\Scripts\activate
-    python select_and_run.py
+    python select_and_save.py
 """
 
 import os
@@ -89,20 +90,21 @@ def main():
     for i, video_path in enumerate(videos_to_run, 1):
         name = os.path.basename(video_path)
         base, ext = os.path.splitext(name)
+        output_path = os.path.join(VIDEO_DIR, f"{base}_MCN_result{ext}")
 
         print(f"\n{'=' * 60}")
         if selection == 0:
             print(f"Processing [{i}/{len(videos_to_run)}]: {name}")
         else:
             print(f"Processing: {name}")
-        print("Output: Not saving (use select_and_save.py to save)")
+        print(f"Output: {os.path.basename(output_path)}")
         print(f"{'=' * 60}")
 
         pipeline.mcn.reset()  # Reset MCN memory between videos
 
         pipeline.run(
             input_source=video_path,
-            output_path=None,
+            output_path=output_path,
             display=True,
             print_json=True,
         )

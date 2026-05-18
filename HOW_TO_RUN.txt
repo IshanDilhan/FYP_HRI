@@ -30,9 +30,13 @@ Always activate first before running anything.
 
 Put your test videos inside the "testVideos" folder.
 
-To see an interactive menu of all your videos and choose one to run:
+To see an interactive menu of all your videos and choose one to run (fast, no save):
 
     python select_and_run.py
+
+If you want to SAVE the annotated output video, run this instead:
+
+    python select_and_save.py
 
 This will:
   - List all videos in the folder
@@ -41,7 +45,7 @@ This will:
   - Run all 4 AI models on each frame
   - Show detected emotion, gesture, motion, and context
   - Show the robot's scenario decision and action
-  - Save the annotated video to the testVideos folder with "_MCN_result" added to the name.
+  - (If using select_and_save.py) Save the annotated video to the testVideos folder with "_MCN_result" added to the name.
 
 Example manual command (if you don't want to use the menu):
 
