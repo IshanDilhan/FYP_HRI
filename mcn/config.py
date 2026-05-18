@@ -111,8 +111,8 @@ class MCNConfig:
     seq_len: int = 48             # window_size × n_modalities
 
     # --- Classification ---
-    n_intents: int = len(INTENT_CATEGORIES)  # Number of intent classes
-    n_conflicts: int = len(CONFLICT_TYPES)   # Number of conflict types
+    n_intents: int = len(INTENT_VOCAB)       # Number of intent classes (incl UNK)
+    n_conflicts: int = len(CONFLICT_VOCAB)   # Number of conflict types (incl UNK)
 
     # --- Vocabulary sizes (including <UNK>) ---
     context_vocab_size: int = len(CONTEXT_VOCAB)
