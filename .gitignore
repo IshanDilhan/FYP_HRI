@@ -48,14 +48,27 @@ checkpoints/*
 Thumbs.db
 
 # Project Specific
-ourModelsprojects/**/*
-!ourModelsprojects/**/*.py
-!ourModelsprojects/**/*.csv
-!ourModelsprojects/**/*.json
-ourModelsprojects/**/dataset/
+ourModelsprojects/*
+!ourModelsprojects/context/
+!ourModelsprojects/emotion/
+!ourModelsprojects/gesture/
+!ourModelsprojects/motion/
+
+# Ignore virtual environments, checkpoints, and datasets
+ourModelsprojects/**/env/
+ourModelsprojects/**/venv/
 ourModelsprojects/**/checkpoints/
+ourModelsprojects/**/dataset/
+ourModelsprojects/**/testVideo/
+ourModelsprojects/**/testVideos/
+ourModelsprojects/**/output/
 ourModelsprojects/**/*.pth
 ourModelsprojects/**/*.pt
 ourModelsprojects/**/*.tflite
-ourModelsprojects/**/venv/
-ourModelsprojects/**/env/
+ourModelsprojects/**/*.mp4
+ourModelsprojects/**/*.avi
+
+# Ensure all python, config, csv, and json files are tracked
+!ourModelsprojects/**/*.py
+!ourModelsprojects/**/*.csv
+!ourModelsprojects/**/*.json
